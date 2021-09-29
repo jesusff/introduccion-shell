@@ -1,0 +1,333 @@
+% bashshell_cs - bash shell cheatsheet
+%
+% Change log:
+%
+% 09-oct-2018, jf
+%   * Added awk, rsync, ssh and scp commands
+%   * Improve man and cut entries
+% 08-oct-2018, Jesus Fernandez (jf) <Jesus.Fernandez@unican.es>
+%   * First decent version, vi left out through commented \input statement
+%
+\documentclass[10pt,landscape,a4paper]{article}
+\usepackage{pslatex}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{calc}
+\usepackage{color}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=0.5cm]{geometry}
+
+% Turn off header and footer
+\pagestyle{empty}
+
+% Redefine section commands to use less space
+\makeatletter
+\renewcommand\section{\@startsection{section}{1}{0mm}%
+                                     {-24pt}% \@plus -12pt \@minus -6pt}%
+                                     {0.5ex}%
+                                {\normalfont\large\bfseries}}
+\makeatother
+
+% Don't print section numbers
+\setcounter{secnumdepth}{0}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+\newcommand{\code}{\texttt}
+\newcommand{\bcode}[1]{\texttt{\textbf{#1}}}
+\newcommand\F{\code{FALSE}}
+\newcommand\T{\code{TRUE}}
+
+%\newcommand{\hangpara}[2]{\hangindent#1\hangafter#2\noindent}
+%\newenvironment{hangparas}[2]{\setlength{\parindent}{\z@}\everypar={\hangpara{#1}{#2}}}
+
+\newcommand{\describe}[1]{\begin{description}{#1}\end{description}}
+
+
+% -----------------------------------------------------------------------
+
+\begin{document}
+
+%\raggedright
+\footnotesize
+\begin{multicols}{3}
+
+% multicol parameters
+% These lengths are set only within the two main columns
+%\setlength{\columnseprule}{0.25pt}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\begin{center}
+     \Large{\textbf{BASH Shell}} \\
+\end{center}
+por Jesús Fernández (Universidad de Cantabria), Jesus.Fernandez\reflectbox{\copyright}unican.es\\Este resúmen de instrucciones para terminal bash y otros comandos útiles ha sido puesto en el dominio público. Contacte al autor para obtener la versión más reciente.
+
+\hfill $\rightarrow$ 09-10-2018
+
+\section{Lo + básico}
+\everypar={\hangindent=1em}
+
+\bcode{pwd} muestra la ruta actual
+
+\bcode{ls} lista el contenido del directorio actual\\
+  \bcode{-ltr} lista con detalle y de más antiguo a más nuevo\\
+  \bcode{-lSr} lista con detalle y de más pequeño a mas grande
+
+\bcode{cd \emph{dir}} entra en el directorio \emph{dir}\\ 
+  \bcode{-} Vuelve al último directorio
+
+\bcode{mkdir \emph{dir}} crea un nuevo directorio \emph{dir}  
+
+\bcode{rmdir \emph{dir}} borra el directorio \emph{dir} (vacío)  
+
+\bcode{rm \emph{fich}} borra el fichero \emph{fich}\\  
+  \bcode{-r} (¡Usar con cuidado!) borra recursivamente un directorio y todo su contenido\\
+  \bcode{-f} (¡Usar con cuidado!) fuerza el borrado aunque no tengas permisos de escritura
+
+\bcode{man \emph{com}} muestra la documentación del comando \emph{com} (Se sale pulsando \code{q}). Si no hay página de manual de un comando, muchos de ellos admiten la opción \code{--help} o \code{-h}
+
+\bcode{more \emph{fich}} muestra por pantalla el contenido de un fichero de texto. Dar \emph{return} para avanzar una línea o \emph{espacio} para avanzar una pantalla entera. No se puede retroceder. Para ver el contenido de un fichero pudiendo retroceder, utilizar el comando \bcode{less} (no siempre disponible).
+
+\section{Variables de entorno}
+\everypar={\hangindent=1em}
+
+\bcode{\emph{var}=\emph{valor}} crea la variable de entorno \emph{var} y le asigna un determinado \emph{valor}. Sólo es accesible a la shell actual.
+
+\bcode{export \emph{var}=\emph{valor}} exporta la variable de entorno \emph{var}, de forma que es accesible no sólo en la shell actual, sino en sub-shells, ejecutables y scripts ejecutadas desde ésta.
+
+\bcode{env} Muestra todas las variables definidas en la shell en curso.
+
+\bcode{unset \emph{var}} Elimina una variable previamente definida.
+
+\bcode{\$\{var\}} la shell sustituye esta expresión por el valor de la variable. Existen numerosas variantes útiles:\\
+  \bcode{\$\{var//old/new\}} el valor de la variable sustituyendo el texto (o ER) \emph{old} por \emph{new}.\\
+  \bcode{\$\{\#var\}} el número de caracteres de la variable.\\
+  \bcode{\$\{var:ini\}}\\
+  \bcode{\$\{var:ini:long\}} Muestra el valor de la variable comenzando en el carácter en la posición \emph{ini} y mostrando únicamente \emph{long} caracteres a partir de ese punto.\\
+  \bcode{\$\{var:-\emph{def}\}} Si existe la variable \code{var}, muestra su valor. Si no, muestra el valor por defecto \emph{def}.\\
+
+\section{Comandos útiles}
+\everypar={\hangindent=1em}
+
+\bcode{alias \emph{nombre}=\emph{comando}} Define un \emph{nombre} abreviado para un \emph{comando}. Lo normal es hacer que persista entre sesiones, por ejemplo, poniendolo en el .bashrc. se puede vitar caer en un alias poniendo por delante una contrabarra (e.g. \bcode{{\textbackslash}ls})
+
+\bcode{chmod \emph{opc} \emph{fichero}} Cambia los permisos de un fichero o directorio. Opc:\\
+  \bcode{g+rw} Añade permisos de lectura y escritura al grupo\\
+  \bcode{664} Permiso de lectura y escritura al dueño y al grupo, sólo lectura a otros
+
+\bcode{chown \emph{usuario:grupo} \emph{fichero}} Cambia el dueño de un fich. o directorio.
+
+\bcode{date} Muestra, en multitud de formatos, la fecha actual o cualquier otra que se le indique.\\
+   \bcode{+"\%Y-\%m-\%d \%H:\%M:\%S"} Da formato de salida a la fecha\\
+   \bcode{-d \emph{fecha}} Muestra esta fecha en lugar de la actual\\
+   \bcode{-u} Muestra la hora UTC
+
+\bcode{diff \emph{fich1} \emph{fich2}} Muestra las diferencias entre dos ficheros de texto y las envía a la salida estándar.
+
+\bcode{echo \emph{texto}} Envía un \emph{texto} a la salida estándar.\\
+  \bcode{-n} No introduce una nueva linea al acabar el texto.\\
+  \bcode{-e} Interpreta caracteres ``escapados'' en el texto ({\textbackslash}n, {\textbackslash}t, {\textbackslash}a, {\textbackslash}0nnn, {\textbackslash}xHH)
+
+\bcode{file} Da información sobre el tipo de fichero.
+
+\bcode{find \emph{dir} [opciones]} busca ficheros en el directorio \emph{dir} y devuelve su ruta completa.
+  Entre las opciones más útiles están:\\
+  \bcode{-type d|f|l} Localiza ficheros de un determinado tipo (\textbf{d}irectorios, \textbf{f}icheros, \textbf{l}inks, ...)\\
+  \bcode{-name '\emph{patrón}'} busca ficheros con un determinado \emph{patrón} en el nombre. Por ejemplo, \code{find . -name '*.py'} encuentra los ficheros con extensión py. La opción \bcode{-iname} es insensible a mayúsculas y minúsculas.\\
+  \bcode{-mtime -\emph{n}} localiza ficheros modificados hace menos de \emph{n} días. También se puede poner +\emph{n}, para los que han sido modificados hace más de \emph{n} días. Hay otra opción \bcode{-mmin} para indicar el tiempo en minutos, así como filtros por tiempo de acceso en lugar de modificación.\\
+  \bcode{-exec \emph{comando} \symbol{92};} A cada fichero encontrado le aplica el \emph{comando} proporcionado. El comando debe incluir \bcode{\{\}} en el lugar del nombre del fichero.
+
+\bcode{hexdump -C \emph{fich}} Muestra un fichero byte a byte (en hexadecimal)
+
+\bcode{paste \emph{fich1} \emph{fich2}} Une dos ficheros línea a línea y los envía a la salida estándar.
+
+\bcode{read \emph{var1} [... \emph{varn}]} Lee variables de la entrada estándar y las asigna en orden. Útil para bucles (\bcode{while read ... ; do ... done}) y ``here documents'' (\bcode{read ... <<< \${var}})
+
+\bcode{rsync -auv \emph{usuario}@\emph{host}:\emph{ruta} .} Sincroniza el directorio actual con una ruta remota (ver ssh), copiando únicamente los ficheros que difieren y sun más recientes (\code{-u}) y preservando todos los permisos y propietarios (\code{-a}).\\
+  \bcode{-n} No realiza la copia. Sólo muestra los ficheros que movería.
+
+\bcode{scp \emph{usuario}@\emph{host}:\emph{ruta} .} Copia segura de un fichero  desde una máquina remota.\\
+  \bcode{-r} Copia un directorio de forma recursiva.\\
+  \bcode{-P \emph{puerto}} Para usar un puerto que no sea el que usa por defecto este programa (el 22).
+
+\bcode{seq \emph{desde} \emph{hasta}} Genera una secuencia de valores numéricos desde un número inicial hasta otro. Si se dan 3 números, el central es el paso.\\
+  \bcode{-w} Iguala la anchura de la salida rellenando con ceros.\\
+  \bcode{-f \emph{formato}} Controla por completo el \emph{formato} de salida.
+
+\bcode{ssh \emph{usuario}@\emph{host}} Conexión segura (con un determinado nombre de \emph{usuario}) a una terminal remota servida desde un \emph{host} (puede ser una IP o un nombre válido).\\
+  \bcode{-X} Canaliza los gráficos a través de la conexión segura.\\
+  \bcode{-p \emph{puerto}} Para conectarse a un puerto que no sea el que usa por defecto este programa (el 22).
+
+\bcode{strings \emph{fich}} Muestra solo los caracteres ASCII imprimibles de un fichero.
+
+\bcode{tar} Des/empaqueta archivos y directorios en un solo archivo\\
+  \bcode{-cf \emph{fich.tar dir}} crea el archivo \emph{fich.tar} conteniendo el directorio \emph{dir}\\
+  \bcode{-tf \emph{fich.tar}} muestra el contenido del archivo \emph{fich.tar}\\
+  \bcode{-xf \emph{fich.tar}} desempaqueta el contenido del archivo \emph{fich.tar} en el directorio actual\\
+  \bcode{-xzf \emph{fich.tar.gz}} desempaqueta el contenido del archivo tar comprimido mediante gzip \emph{fich.tar.gz} en el directorio actual (la opción -z no siempre está disponible)
+
+\bcode{wget \emph{url}} Descarga de internet el recurso al que apunta la \emph{url}
+
+\bcode{which \emph{ejec}} muestra la ruta en la que se encuentra el fichero ejecutable \emph{ejec}
+
+\section{Tuberías y E/S}
+\everypar={\hangindent=1em}
+
+\bcode{|} Tubería (pipe). Conecta la salida estándar de un comando con la entrada estándar del siguiente.
+
+\bcode{comando $>$ fichero} Envía la salida estándar de un comando a un fichero. Pisa el contenido de éste si existiese.
+
+\bcode{comando $>$\& fichero} Envía la salida estándar y de error de un comando a un fichero. Pisa el contenido de éste si existiese.
+
+\bcode{comando $>>$ fichero} Envía la salida estándar de un comando a un fichero. Añade el cotenido al que ya tuviera el fichero.
+
+\section{Filtrando texto}
+Los comandos que se muestran a continuación trabajan con texto. Este puede venir por la entrada estándar o indicar un fichero como argumento de cada uno de los comandos.\\[1mm]
+
+\everypar={\hangindent=1em}
+
+\bcode{cat} Envía un fichero (o varios seguidos) a la salida estándar.
+
+\bcode{tail} muestra las 10 últimas líneas. \bcode{head} muestra las 10 primeras\\
+  \bcode{-\emph{num}} muestra \emph{num} líneas\\
+  \bcode{-f} muestra contínuamente el final del fichero. Se ven nuevas líneas a medida que aparecen. Salir con \code{Ctrl-C}
+
+\bcode{sort} Ordena las líneas de un fichero alfabéticamente.\\
+  \bcode{-r} Ordena en orden inverso.\\
+  \bcode{-n} Ordena numéricamente en lugar de alfabéticamente.\\
+  \bcode{-k \emph{num}} Ordena por la columna \emph{num}.
+
+\bcode{cut} Recorta cada línea de un fichero y la envía a la salida estándar.\\
+  \bcode{-c \emph{desde}-\emph{hasta}} Indica desde qué carácter hasta cuál se recortará.\\
+  \bcode{-d \emph{delim}} Indica el \emph{delim}itador de campos (por defecto el \code{TAB}).\\
+  \bcode{-f \emph{desde}-\emph{hasta}} Indica qué campos recortar.
+
+\bcode{uniq} Elimina líneas duplicadas consecutivas.\\
+  \bcode{-c} Añade a la salida el número de veces que se repetía la línea.
+
+\bcode{wc} Cuenta el número de líneas, palabras y caracteres. Si sólo se quiere una de estas cuentas se puede especificar la opción \bcode{-l} (líneas), \bcode{-w} (palabras) o \bcode{-c} (caracteres).
+
+\bcode{nl} Añade números de línea.\\
+  \bcode{-v \emph{num}} Empieza a numerar la primera línea por \emph{num}.
+
+\bcode{tr \emph{origen} \emph{destino}} Reemplaza carácter a carácter cada elemento de \emph{origen} por el correspondiente de \emph{destino}.\\
+  \bcode{-d \emph{origen}} Elimina estos caracteres (en lugar de reemplazarlos).
+
+\bcode{grep \emph{patrón}} Selecciona sólo las líneas que cumplen con un determinado \emph{patrón}. En el caso más sencillo, simplemente aquellas que contienen una palabra.\\
+  \bcode{-i} Opera de forma insensible a mayúsculas y minúsculas.\\
+  \bcode{-v} Selecciona las líneas que NO cumplen con el \emph{patrón}.\\
+  \bcode{-E} Permite expresiones regulares complejas en el \emph{patrón}.\\
+  \bcode{-l} Muestra el nombre del fichero si cumple el \emph{patrón}.
+
+\bcode{awk} permite, no sólo filtrar líneas (como grep), sino también filtrar por valores númericos, trabajar con columnas y programar de forma sencilla. Algunos casos de uso típicos:\\
+  \bcode{'/\emph{patrón}/'} Comportamiento similar a grep.\\
+  \bcode{'/\emph{patrón}/ \{print \$3,\$5\}'} Filtra las líneas que cumplen el patrón y muestra de ellas sólo las columnas 3 y 5.\\
+  \bcode{-F,} Esta opción permite elegir el separador de columnas (por defecto son los espacios).\\
+  \bcode{'\$1>=7 \{print \$2\}'} Muestra la segunda columna de aquellas líneas cuya primera columna es mayor o igual que 7.
+
+\bcode{sed} es un editor de un flujo de texto. Una operación habitual es la sustitución de texto más avanzada que con \code{tr}:\\
+  \bcode{-e 's/old/new/g'} sustituye (s) todas las apariciones (g) de un texto (old) por otro (new). el texto de origen (old) puede ser una expresión regular.\\
+  \bcode{-e '7iTEXTO'} (i)nserta un texto en la línea 7. Otros comandos: también puede (a)ñadir texto a una línea, borrar (d)elete una línea, mostrar (p)rint una línea concreta (en este caso, -n suprime el resto de salida del comando).\\
+  \bcode{-i} (¡Usar con cuidado!) Hace la sustitución directamente en el fichero, en lugar de enviarla a la salida estándar.
+
+\bcode{xargs \emph{comando}} Hace que la entrada estándar sean los argumentos de un \emph{comando}
+
+\section{Sustitución automática en la shell}
+\everypar={\hangindent=1em}
+
+\bcode{\emph{Comillas dobles y simples}}
+
+\bcode{\textasciitilde} Representa el directorio HOME del usuario
+
+\bcode{{\textasciitilde}usuario} Se refiere al HOME de otro usuario
+
+\bcode{\$(\emph{comando})} Reemplaza en este punto la salida estándar de un \emph{comando}.
+
+\bcode{PATH} Variable de entorno que contiene los directorios en los que la shell busca (en orden) el nombre de un comando (prevalecen alias, funciones y comando internos).
+
+\bcode{type} Indica como un nombre sería interpretado por la shell
+
+
+\section{Procesos}
+\everypar={\hangindent=1em}
+
+\bcode{(\emph{comando})} Ejecuta \emph{comando} en una sub-shell
+
+\bcode{source \emph{script}} Ejecuta una \emph{script} en la shell actual. Es como si escribiésemos los comandos directamente en la terminal o script que estemos usando.
+
+\bcode{\&} Al final de un comando, indica que este debe ejecutarse en el fondo (background), de forma que recuperamos el control de la terminal.
+
+\bcode{jobs} lista las tareas que se están ejecutando actualmente en el fondo.
+
+\bcode{\$?} Muestra el código de salida del último comando.
+
+\bcode{CTRL-Z} Detiene una tarea en ejecución. Se puede reanudar enviándola a ejecutar al fondo (bg) o recuperándola en el frente (fg).
+
+\bcode{bg} y \bcode{fg} envían, respectivamente, una tarea al fondo (background) o al frente (foreground).
+
+\bcode{ps aux} lista todos los procesos actualmente en ejecución. La segunda columna es el ID de proceso (PID), que nos puede servir para actuar sobre él.
+
+\bcode{top} muestra de forma interactiva todas las tareas que se están ejecutando en el sistema. Ayuda: ? Salir: q
+
+\bcode{kill \emph{pid}} envía una señal para detener una tarea.
+
+\bcode{wait \emph{pid}} espera hasta que acabe una determinada tarea.
+
+\section{Programación en \emph{bash} (creación de \emph{scripts})}
+%\everypar={\hangindent=1em}
+La shell es un lenguaje de programación completo.
+
+\bcode{\#! /bin/bash}
+
+\bcode{function mifuncion \{\\\hspace*{1em}sentencias\\\}}
+
+\bcode{var1="texto"}
+
+\bcode{var2=17 \# Es tb. texto}
+
+\bcode{var3=\$(comando)}
+
+\bcode{for item in lista; do\\\hspace*{1em}sentencias\\done}
+
+\bcode{\# Comentario}
+
+\bcode{if [ \$var -eq valor ]; then\\\hspace*{1em}\# man test: ver operadores de comparación\\\hspace*{1em}sentencias\\fi}
+
+\bcode{case \$var in\\\hspace*{1em}valor1) sentencias;;\\\hspace*{1em} ...\\\hspace*{1em}valorn) sentencias;;\\esac}
+
+\bcode{echo "A salida estándar con sustitución de \$\{vars\}"}
+
+\section{Otras herramientas}
+\everypar={\hangindent=1em}
+
+%\input{componentes/vi.tex}
+
+\bcode{git} es un sistema de control de versiones. Tiene un amplio abanico de subcomandos, que a su vez tienen opciones. Algunos de los más utilizados son:\\
+  \bcode{init \emph{repo}} Crea un \emph{repo}sitorio local nuevo (vacío, y llamado \emph{repo})\\
+  \bcode{clone \emph{url}} Para replicar localmente un repositorio remoto (situado en \emph{url})\\
+  \bcode{status} Muestra el estado del directorio de trabajo.\\
+  \bcode{checkout -b \emph{nuevarama}} Crea una \emph{nuevarama} a partir del último commit y situa en ella el directorio de trabajo\\
+  \bcode{checkout \emph{rama}} Permite cambiar tu directorio de trabajo a una determinada \emph{rama}.\\
+  \bcode{checkout \emph{commit} \emph{fich}} Copia un \emph{fich}ero según estaba en un determinado \emph{commit} a tu directorio de trabajo\\
+  \bcode{commit -a} Añade todos los ficheros con modificaciones al stage y crea un nuevo commit a partir de ellos.\\
+  \bcode{push \emph{remoto} \emph{rama}} Actualiza una \emph{rama} (la crea si es necesario) de un repositorio \emph{remoto} para coincidir con la historia local.\\
+  \bcode{branch -a} Muestra todas las ramas de desarrollo\\
+  \bcode{remote -v} Muestra todos los repositorios remotos definidos\\
+  \bcode{log -\emph{num}} Muestra los últimos \emph{num} commits.\\
+  \bcode{tag -l -n} Muesta la lista de etiquetas (punteros a commits concretos) definidas\\
+  \bcode{tag -v \emph {etiqueta}} Información sobre una \emph{etiqueta} concreta\\
+
+\bcode{conda} es la interfaz de línea de comandos de Anaconda o miniconda. Se trata de un sistema de gestión de paquetes de software, que permite aislar entornos de ejecución con diferentes versiones del mismo software. Inicialmente ideado para paquetes de Python, hoy en día es capaz de gestionar un creciente número de aplicaciones. Los subcomandos más habituales para \code{conda} son:\\
+  \bcode{env list} Muestra la lista de entornos disponibles. Para activar un entorno se utiliza \bcode{source activate \emph{entorno}} (sin \code{conda} delante).\\
+  \bcode{create -n \emph{entorno} \emph{paquetes}} Crea un nuevo \emph{entorno} e instala en él los \emph{paquetes} que se indiquen separados por espacios. Para crear un entorno "vacío", se puede poner \code{python} como paquete.\\
+  \bcode{install \emph{paquete[=versión]}} Instala un determinado paquete en el entorno activo. Se puede indicar una \emph{versión} especifica. \\
+  \bcode{install -c \emph{canal} \emph{paquete}} Instala un determinado paquete en el entorno activo desde un determinado \emph{canal}. Por ejemplo,\\ \bcode{install -c r r-base r-essentials rstudio} nos instalaría R y Rstudio\\
+  \bcode{remove \emph{paquete}} Desinstala un determinado paquete en el entorno activo.\\
+  \bcode{list -n \emph{entorno}} Muestra la lista de paquetes instalados en un determinado \emph{entorno}. Si está activo no hace falta la opción \code{-n}. \\
+
+\end{multicols}
+\end{document}

@@ -5,3 +5,9 @@
 
 This is material used in the Unix shell sessions in the _Data Science_ and _Particle Physics and
 Physics of the Cosmos_ Master's degrees from Universidad de Cantabria and UIMP.
+
+## Resources
+
+ * Check out the [cheatsheet](./cheatsheet/bashshell_cs.pdf) (in Spanish)
+ * Online course from Software Carpentry: [The Unix Shell](https://swcarpentry.github.io/shell-novice)
+ * Book: [Effective Computation in Physics](https://www.oreilly.com/library/view/effective-computation-in/9781491901564)

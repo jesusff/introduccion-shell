@@ -6,4 +6,5 @@ Write a script `word-count-alice.sh` to:
  * Save the words that appear more than 50 times in a file `word-count-alice.txt`
  * Remove the original file downloaded
 
-Use Moodle's forum to discuss the problems found
+Use Moodle's forum to discuss the problems found.
+Use comments in the script to acknowledge all sources of information used (books, online tutorials, stackexchange threads, etc.).

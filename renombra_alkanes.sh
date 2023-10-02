@@ -1,4 +1,11 @@
-# Renombrar fichos de alkanos paraque conste la formula
+#!/bin/bash
+#
+# renombra_alkanes.sh
+#
+# Renombrar ficheros de alcanos para que conste la formula.
+#
+# Autor: Jesus Fernandez
+# Fecha: 2023-10-02
 
 for fichero in alkanes/*.pdb
 do

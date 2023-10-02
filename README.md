@@ -4,7 +4,7 @@
 # A brief introduction to the BASH shell
 
 This is material used in the Unix shell sessions in the _Data Science_ and _Particle Physics and
-Physics of the Cosmos_ Master's degrees from Universidad de Cantabria and UIMP.
+Physics of the Cosmos_ Master's degrees from Universidad de Cantabria and UIMP. [Slides](https://nbviewer.org/format/slides/github/jesusff/introduccion-shell/blob/main/UnixShell_en.ipynb).
 
 ## Resources
 
